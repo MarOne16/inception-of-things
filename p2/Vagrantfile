@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# 42 login (or your school login), e.g. "mabdelha"
+LOGIN = ENV.fetch("LOGIN", "mqaos")
+
+VM_HOSTNAME = "#{LOGIN}S"
+VM_IP       = "192.168.56.110"
+
+# Box name (adjust if needed for M2 vs school machine)
+BOX_NAME = ENV.fetch("BOX_NAME", "cloud-image/ubuntu-20.04")
+
+VM_CPUS   = 1
+VM_MEMORY = 1024  # MB (bare minimum)
+
+Vagrant.configure("2") do |config|
+  config.vm.box_check_update = false
+
+  # Share project folder inside VM. Use rsync to avoid VirtualBox Guest
+  # Additions dependency in minimal cloud images.
+  config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__auto: true
+
+  config.vm.define VM_HOSTNAME do |vm|
+    vm.vm.box      = BOX_NAME
+    vm.vm.hostname = VM_HOSTNAME
+
+    vm.vm.network "private_network", ip: VM_IP
+
+    vm.vm.provider "virtualbox" do |vb|
+      vb.name   = VM_HOSTNAME
+      vb.cpus   = VM_CPUS
+      vb.memory = VM_MEMORY
+    end
+
+    vm.vm.provision "shell", path: "scripts/common.sh"
+    vm.vm.provision "shell", path: "scripts/k3s_server.sh"
+  end
+end
