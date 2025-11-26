@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app1-html
+data:
+  index.html: |
+    <html><body><h1>APP1</h1><p>Hello from APP1</p></body></html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app2-html
+data:
+  index.html: |
+    <html><body><h1>APP2</h1><p>Hello from APP2</p></body></html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app3-html
+data:
+  index.html: |
+    <html><body><h1>APP3 (default)</h1><p>Hello from APP3</p></body></html>

@@ -1,0 +1,48 @@
+# Vagrant
+.vagrant/
+*/.vagrant/
+*.box
+
+# VirtualBox
+*.vbox-prev
+*.vdi
+*.vmdk
+
+# Logs
+*.log
+vagrant.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+
+# K3s
+kubeconfig
+kubeconfig.yaml
+*.kubeconfig
+
+# Credentials
+token
+*.token
+credentials
+
+# Editor directories
+.vscode/
+.idea/
+*.sublime-*
+
+# OS specific
+Thumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.backup
