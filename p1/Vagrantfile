@@ -1,90 +1,39 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# ==============================
-# Configurable variables
-# ==============================
-
-# 42 login (or your school login).
-# Change this to your real login, e.g. "mabdelha".
 LOGIN = ENV.fetch("LOGIN", "mqaos")
-
-# Hostnames required by the subject:
-# First machine: login + "C" (controller)
-# Second machine: login + "W" (worker)
 MASTER_HOSTNAME = "#{LOGIN}S"
 WORKER_HOSTNAME = "#{LOGIN}SW"
-
-# Static IPs for the two VMs.
-# Change only if your subject explicitly says different ones.
 MASTER_IP = "192.168.56.110"
 WORKER_IP = "192.168.56.111"
-
-# Box name:
-# - On your M2 locally, you can try something like:
-#   BOX_NAME = "bento/ubuntu-22.04-arm64"
-# - For school/x86 machines, you might need to change this
-#   to the official Kaede box or another x86 Ubuntu/Debian box.
 BOX_NAME = ENV.fetch("BOX_NAME", "cloud-image/ubuntu-20.04")
-
-# Minimal resources (as the subject asks: bare minimum).
-# Note: 1024MB was too low for k3s to run properly, increased to 2048MB
 VM_CPUS   = 2
 VM_MEMORY = 2048  # MB
 
 
+
 Vagrant.configure("2") do |config|
-  # Don't spam updates during correction
   config.vm.box_check_update = false
-  # Increase boot timeout for cloud-image boxes
   config.vm.boot_timeout = 600
-
-  # Shared options (you can add synced folders, etc. here if needed)
-  # Disabled because cloud-image boxes don't have guest additions
   config.vm.synced_folder ".", "/vagrant", disabled: true
-
-  # =========================================
-  # Master VM (k3s server / controller)
-  # =========================================
   config.vm.define MASTER_HOSTNAME do |master|
     master.vm.box = BOX_NAME
     master.vm.hostname = MASTER_HOSTNAME
-    # master.vm.box_version = "202309.09.0"
-
-    # Private network with static IP
     master.vm.network "private_network", ip: MASTER_IP
-
-    # Provider-specific settings (VirtualBox example)
     master.vm.provider "virtualbox" do |vb|
       vb.name   = MASTER_HOSTNAME
       vb.cpus   = VM_CPUS
       vb.memory = VM_MEMORY
     end
-
-    # Provisioning scripts
-    # These files must exist in 10/scripts/
     master.vm.provision "shell", path: "scripts/common.sh"
     master.vm.provision "shell", path: "scripts/master.sh"
   end
-
-  # =========================================
-  # Worker VM (k3s agent / node)
-  # =========================================
   config.vm.define WORKER_HOSTNAME do |worker|
     worker.vm.box = BOX_NAME
     worker.vm.hostname = WORKER_HOSTNAME
-
-    # Private network with static IP
     worker.vm.network "private_network", ip: WORKER_IP
-
-    # Provider-specific settings (VirtualBox example)
     worker.vm.provider "virtualbox" do |vb|
       vb.name   = WORKER_HOSTNAME
       vb.cpus   = VM_CPUS
       vb.memory = VM_MEMORY
     end
-
-    # Provisioning scripts
     worker.vm.provision "shell", path: "scripts/common.sh"
     worker.vm.provision "shell", path: "scripts/worker.sh"
   end
