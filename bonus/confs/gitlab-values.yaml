@@ -1,0 +1,67 @@
+# Minimal GitLab for local k3d - disables heavy/unneeded components
+global:
+  hosts:
+    domain: localhost
+    https: false
+    gitlab:
+      name: gitlab.localhost
+      https: false
+  ingress:
+    configureCertmanager: false
+    enabled: true
+    tls:
+      enabled: false
+
+# Disable things we don't need
+certmanager:
+  installCRDs: false
+
+nginx-ingress:
+  enabled: false        # use k3d's built-in Traefik
+
+prometheus:
+  install: false
+
+gitlab-runner:
+  install: false
+
+registry:
+  enabled: false        # saves a lot of RAM
+
+# Minimal replicas and resources
+gitlab:
+  webservice:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+  sidekiq:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 512Mi
+  gitlab-shell:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+
+redis:
+  master:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi

@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: playground-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/rixrix461-ui/argocd_test.git
+    targetRevision: HEAD
+    path: app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true      # delete resources removed from git
+      selfHeal: true   # revert manual changes in cluster
+    syncOptions:
+      - CreateNamespace=true
+
+
+
+
+
+
+
