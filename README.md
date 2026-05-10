@@ -131,8 +131,8 @@ kubectl get nodes
 
 # Expected output:
 # NAME      STATUS   ROLES                  AGE   VERSION
-# mqaoss    Ready    control-plane,master   2m    v1.33.6+k3s1
-# mqaossw   Ready    <none>                 1m    v1.33.6+k3s1
+# mqaoss    Ready    control-plane,master   2m    v1.23.6+k3s1
+# mqaossw   Ready    <none>                 1m    v1.23.6+k3s1
 ```
 
 ---
@@ -170,7 +170,7 @@ kubectl get nodes
 
 # Expected output:
 # NAME     STATUS   ROLES                  AGE   VERSION
-# mqaoss   Ready    control-plane,master   30s   v1.33.6+k3s1
+# mqaoss   Ready    control-plane,master   30s   v1.23.6+k3s1
 ```
 
 ---
