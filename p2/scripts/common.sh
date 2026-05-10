@@ -15,7 +15,8 @@ apt-get install -y \
   vim \
   git \
   gnupg \
-  lsb-release
+  lsb-release \
+  net-tools
 
 # Disable swap (required for k8s)
 swapoff -a || true

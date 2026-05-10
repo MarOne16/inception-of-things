@@ -1,24 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# 42 login (or your school login), e.g. "mabdelha"
-LOGIN = ENV.fetch("LOGIN", "mqaos")
-
+LOGIN       = ENV.fetch("LOGIN", "ibenmain")
 VM_HOSTNAME = "#{LOGIN}S"
 VM_IP       = "192.168.56.110"
-
-# Box name (adjust if needed for M2 vs school machine)
-BOX_NAME = ENV.fetch("BOX_NAME", "cloud-image/ubuntu-20.04")
-
-VM_CPUS   = 1
-VM_MEMORY = 1024  # MB (bare minimum)
+BOX_NAME    = ENV.fetch("BOX_NAME", "bento/ubuntu-24.04")
+VM_CPUS     = 1
+VM_MEMORY   = 1024
 
 Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
-
-  # Share project folder inside VM. Use rsync to avoid VirtualBox Guest
-  # Additions dependency in minimal cloud images.
-  config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__auto: true
+  config.vm.boot_timeout     = 600
+  config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.define VM_HOSTNAME do |vm|
     vm.vm.box      = BOX_NAME
@@ -26,12 +19,13 @@ Vagrant.configure("2") do |config|
 
     vm.vm.network "private_network", ip: VM_IP
 
-    vm.vm.provider "virtualbox" do |vb|
-      vb.name   = VM_HOSTNAME
-      vb.cpus   = VM_CPUS
-      vb.memory = VM_MEMORY
+    vm.vm.provider "vmware_desktop" do |vf|
+      vf.vmx["displayname"] = VM_HOSTNAME
+      vf.cpus   = VM_CPUS
+      vf.memory = VM_MEMORY
     end
 
+    vm.vm.provision "file",  source: "configs", destination: "/tmp/k8s-configs"
     vm.vm.provision "shell", path: "scripts/common.sh"
     vm.vm.provision "shell", path: "scripts/k3s_server.sh"
   end

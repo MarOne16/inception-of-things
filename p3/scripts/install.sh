@@ -30,8 +30,16 @@ echo "[✓] K3d"
 
 # ── Create cluster (localhost:8888 → NodePort 30080 → app pod) ───────────────
 k3d cluster list 2>/dev/null | grep -q "mycluster" \
-    || k3d cluster create mycluster --port "8888:30080@loadbalancer"
+    || k3d cluster create mycluster --port "8888:30080@loadbalancer" --wait
 kubectl config use-context k3d-mycluster
+
+# Wait until the API server actually answers (TLS handshake ready)
+echo "[+] Waiting for API server..."
+for i in {1..60}; do
+    kubectl get --raw=/readyz &>/dev/null && break
+    sleep 2
+done
+kubectl wait --for=condition=Ready node --all --timeout=120s
 echo "[✓] Cluster"
 
 # ── Create namespaces ─────────────────────────────────────────────────────────
