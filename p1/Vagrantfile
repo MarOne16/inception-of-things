@@ -3,9 +3,9 @@ MASTER_HOSTNAME = "#{LOGIN}S"
 WORKER_HOSTNAME = "#{LOGIN}SW"
 MASTER_IP = "192.168.56.110"
 WORKER_IP = "192.168.56.111"
-BOX_NAME = ENV.fetch("BOX_NAME", "cloud-image/ubuntu-20.04")
-VM_CPUS   = 2
-VM_MEMORY = 2048  # MB
+BOX_NAME = ENV.fetch("BOX_NAME", "bento/ubuntu-24.04")
+VM_CPUS   = 1
+VM_MEMORY = 1024
 
 
 
@@ -17,8 +17,7 @@ Vagrant.configure("2") do |config|
     master.vm.box = BOX_NAME
     master.vm.hostname = MASTER_HOSTNAME
     master.vm.network "private_network", ip: MASTER_IP
-    master.vm.provider "virtualbox" do |vb|
-      vb.name   = MASTER_HOSTNAME
+    master.vm.provider "vmware_desktop" do |vb|
       vb.cpus   = VM_CPUS
       vb.memory = VM_MEMORY
     end
@@ -29,8 +28,7 @@ Vagrant.configure("2") do |config|
     worker.vm.box = BOX_NAME
     worker.vm.hostname = WORKER_HOSTNAME
     worker.vm.network "private_network", ip: WORKER_IP
-    worker.vm.provider "virtualbox" do |vb|
-      vb.name   = WORKER_HOSTNAME
+    worker.vm.provider "vmware_desktop" do |vb|
       vb.cpus   = VM_CPUS
       vb.memory = VM_MEMORY
     end

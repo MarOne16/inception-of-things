@@ -37,16 +37,16 @@ K3S_SERVER_IP=$(cat "/tmp/k3s_server_ip")
 
 echo "[WORKER] Got token and server IP: ${K3S_SERVER_IP}"
 
-# Detect this node IP (private network IP)
-# Get the IP from the 192.168.56.0/24 subnet
+# Detect this node's private network IP and interface
 WORKER_IP=$(ip -4 addr show | grep -oP '(?<=inet\s)192\.168\.56\.\d+')
-echo "[WORKER] Detected worker IP: ${WORKER_IP}"
+FLANNEL_IFACE=$(ip -4 addr | grep "192\.168\.56\." | awk '{print $NF}')
+echo "[WORKER] Detected worker IP: ${WORKER_IP} on interface: ${FLANNEL_IFACE}"
 
 # Install k3s agent and join cluster
 curl -sfL https://get.k3s.io | \
   K3S_URL="https://${K3S_SERVER_IP}:6443" \
   K3S_TOKEN="${K3S_TOKEN}" \
-  INSTALL_K3S_EXEC="--node-ip ${WORKER_IP} --node-external-ip ${WORKER_IP}" \
+  INSTALL_K3S_EXEC="--node-ip ${WORKER_IP} --node-external-ip ${WORKER_IP} --flannel-iface ${FLANNEL_IFACE}" \
   sh -
 
 echo "[WORKER] k3s agent installation complete."

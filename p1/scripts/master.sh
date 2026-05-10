@@ -3,14 +3,14 @@ set -euo pipefail
 
 echo "[MASTER] Starting k3s server installation..."
 
-# Detect this node's primary IP (the private network IP)
-# Get the IP from the 192.168.56.0/24 subnet
+# Detect this node's private network IP and interface
 MASTER_IP=$(ip -4 addr show | grep -oP '(?<=inet\s)192\.168\.56\.\d+')
-echo "[MASTER] Detected IP: ${MASTER_IP}"
+FLANNEL_IFACE=$(ip -4 addr | grep "192\.168\.56\." | awk '{print $NF}')
+echo "[MASTER] Detected IP: ${MASTER_IP} on interface: ${FLANNEL_IFACE}"
 
 # Install k3s server
 # It will also install kubectl as /usr/local/bin/kubectl symlink
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode 644 --node-ip ${MASTER_IP} --node-external-ip ${MASTER_IP}" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode 644 --node-ip ${MASTER_IP} --node-external-ip ${MASTER_IP} --flannel-iface ${FLANNEL_IFACE}" sh -
 
 echo "[MASTER] k3s server installed."
 
@@ -18,9 +18,7 @@ echo "[MASTER] k3s server installed."
 echo "[MASTER] Waiting for k3s server to be ready..."
 sleep 20
 
-# -----------------------------
 # Export token and IP for worker
-# -----------------------------
 TOKEN_FILE="/var/lib/rancher/k3s/server/node-token"
 DEST_DIR="/tmp"
 DEST_TOKEN="${DEST_DIR}/k3s_token"
@@ -46,9 +44,7 @@ else
   exit 1
 fi
 
-# -----------------------------
 # Small check: list nodes (only master at this stage)
-# -----------------------------
 echo "[MASTER] Checking k3s nodes..."
 kubectl get nodes || echo "[MASTER] kubectl not ready yet, this may still be fine."
 
